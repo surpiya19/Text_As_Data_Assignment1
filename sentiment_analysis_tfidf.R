@@ -102,6 +102,39 @@ raw_vs_tfidf_words <- sentiment_words %>%
 write_csv(final_sentiment, "sentiment_comparison.csv")
 
 
+### ---- additional challenge
+
+# 1. Total TF-IDF sentiment per document
+
+total_tfidf_sentiment <- sentiment_tfidf_words %>%
+  group_by(doc_title) %>%
+  summarise(
+    total_tfidf_sentiment = sum(tf_idf),
+    .groups = "drop"
+  )
+
+# 2. Top 5 sentiment words per document
+
+top5_tfidf_words <- sentiment_tfidf_words %>%
+  arrange(desc(tf_idf)) %>%
+  group_by(doc_title) %>%
+  slice_head(n = 5) %>%
+  ungroup()
+
+# 3. Proportion of sentiment carried by top 5 words
+
+tfidf_concentration <- top5_tfidf_words %>%
+  group_by(doc_title) %>%
+  summarise(
+    top5_tfidf_sentiment = sum(tf_idf),
+    .groups = "drop"
+  ) %>%
+  left_join(total_tfidf_sentiment, by = "doc_title") %>%
+  mutate(
+    proportion_top5 = top5_tfidf_sentiment / total_tfidf_sentiment
+  )
+
+
 
 
 
